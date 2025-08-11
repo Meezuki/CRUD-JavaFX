@@ -1,5 +1,6 @@
 Build Path in Eclipse
-modulepath: JavaFX & SDK, classpath: mysql connector
+modulepath: JavaFX & SDK
+classpath: mysql connector
 
 RUN CONFIGURATIONS
 Arguments:
