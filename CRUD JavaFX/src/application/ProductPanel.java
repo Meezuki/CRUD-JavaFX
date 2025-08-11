@@ -89,6 +89,7 @@ public class ProductPanel extends BorderPane {
         
         loadTable(); // load tables with products
         addButton.setOnAction(e -> addProduct());
+        delButton.setOnAction(e -> deleteProduct());
         table.setOnMouseClicked(e -> populateForm());
         
         
@@ -106,6 +107,7 @@ public class ProductPanel extends BorderPane {
     private void loadTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
     	table.setItems(productList);
+    	System.out.println("[+] Table data refreshed");
     }
     
     private void populateForm() {
@@ -119,7 +121,7 @@ public class ProductPanel extends BorderPane {
 	}
 
 	private boolean fieldIsEmpty() {
-    	if(!modelField.getText().isEmpty() &&!merkField.getText().isEmpty()&&!warnaField.getText().isEmpty()&&!warnaField.getText().isEmpty()) {
+    	if(!modelField.getText().isEmpty() &&!merkField.getText().isEmpty()&&!warnaField.getText().isEmpty()&&!hargaField.getText().isEmpty()) {
     		return false;
     	} else {
     		return true;
@@ -141,22 +143,40 @@ public class ProductPanel extends BorderPane {
     	
     	if(!fieldIsEmpty()) {
     		Product product = new Product(ProductHandler.generateCode(tempMerek),tempModel, tempMerek, tempWarna, tempHarga);
-    		table.getItems().add(product);
+    		// add to the table 
+    		//table.getItems().add(product);
+    		
+    		
+    		//add to the database and refresh table
+    		if(ProductHandler.insertProduct(product)) {
+    			loadTable();
+    		} else {
+    			showError("Operation Failed. Something broke");
+    		}
+    		
     	} else {
     		showError("All forms must be filled!");
     	}
         
         clearFields();
     }
-    
-    
-    
-    
-    private String findKode(String merek) {
-    	Character firstLetter = merek.charAt(0);
-    	
-    	return firstLetter + "001";
-    	
+    private void deleteProduct() {
+    	Product selected = table.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+        	if(ProductHandler.deleteProduct(selected.getKode())) {
+    			loadTable();
+    		} else {
+    			showError("Operation Failed. Something broke");
+    		}
+        	
+        } else {
+        	showError("No product is currently selected!");
+        	return;
+        }
+        loadTable();
     }
+    
+    
+    
     
 }
