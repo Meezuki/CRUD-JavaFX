@@ -16,6 +16,7 @@ public class Main extends Application {
 			// Tab pane as the base to switch between pages
 			TabPane tabPane = new TabPane();
 			
+			primaryStage.setTitle("CRUD ( Create, Read, Update, Delete)");
 			
 			// Product page (tab 1)
 			ProductPanel productPanel = new ProductPanel();

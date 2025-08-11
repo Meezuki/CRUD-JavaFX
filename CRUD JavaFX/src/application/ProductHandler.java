@@ -107,9 +107,41 @@ public class ProductHandler {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		 return false; 
+	 }
+	 
+	 public static boolean updateProduct(Product product) {
+		 String query = "UPDATE sepatu SET model_sepatu = ?,merk_sepatu=? ,warna_sepatu=? , harga_sepatu= ? WHERE kode_sepatu = ?";
+		 
+		 try{
+				Connection connection = DatabaseConnection.getConnection();
+				PreparedStatement ps = connection.prepareStatement(query);
+				ps.setString(1, product.getModel());
+				ps.setString(2, product.getMerk());
+				ps.setString(3, product.getWarna());
+				ps.setString(4, product.getHarga());
+				ps.setString(5, product.getKode());
+				
+				if(ps.executeUpdate()>0) {
+					System.out.printf("[+] Successfully updated product with code %s to [%s, %s, %s, %s, %s]\n",product.getKode(),product.getKode(),product.getModel(),product.getMerk(),product.getWarna(),product.getHarga());
+					return true;
+				}else {
+					System.out.printf("[!] Successfully updated product with code %s to [%s, %s, %s, %s, %s]\n",product.getKode(),product.getKode(),product.getModel(),product.getMerk(),product.getWarna(),product.getHarga());
+					return false;
+				}
+				
+				
+				
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		 return false;
 		 
 	 }
+	 
+	 
+	 
 	 
 	 
 }

@@ -72,7 +72,7 @@ public class ProductPanel extends BorderPane {
         TableColumn<Product, String> kodeCol = new TableColumn<>("Kode");
         kodeCol.setCellValueFactory(new PropertyValueFactory<>("kode"));
 
-        TableColumn<Product, String> modelCol = new TableColumn<>("Model"); // changed from "Jenis"
+        TableColumn<Product, String> modelCol = new TableColumn<>("Model"); 
         modelCol.setCellValueFactory(new PropertyValueFactory<>("model")); // bound to Product.getModel()
 
         TableColumn<Product, String> merkCol = new TableColumn<>("Merk");
@@ -90,6 +90,7 @@ public class ProductPanel extends BorderPane {
         loadTable(); // load tables with products
         addButton.setOnAction(e -> addProduct());
         delButton.setOnAction(e -> deleteProduct());
+        updButton.setOnAction(e -> updateProduct());
         table.setOnMouseClicked(e -> populateForm());
         
         
@@ -97,19 +98,48 @@ public class ProductPanel extends BorderPane {
         this.setRight(table);
     }
     
-    //Print error message
+    private void updateProduct() {
+    	Product selected = table.getSelectionModel().getSelectedItem();
+    	if (selected != null) {
+	    	String tempModel = modelField.getText();
+	    	String tempMerek = merkField.getText();
+	    	String tempWarna = warnaField.getText();
+	    	String tempHarga = hargaField.getText();
+	    	
+	    	if(!fieldIsEmpty()) {
+	    		Product product = new Product(selected.getKode(),tempModel, tempMerek, tempWarna, tempHarga);
+	    		//modifies the column in and load table
+	    		if(ProductHandler.updateProduct(product)) {
+	    			loadTable();
+	    		} else {
+	    			showError("Operation Failed. Something broke");
+	    		}
+	    		
+	    	} else {
+	    		showError("All forms must be filled!");
+	    	}    
+        clearFields();
+    	} else {
+    		showError("No product is currently selected!");
+        	return;
+    	}
+	}
+
+	//Print error message
     private void showError(String msg) {
     	a = new Alert(AlertType.ERROR);
 		a.setContentText(msg);
 		a.show();
     }
     
+    // Make list, connect to DB, fills the list with data, insert list to table 
     private void loadTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
     	table.setItems(productList);
     	System.out.println("[+] Table data refreshed");
     }
     
+    // auto fill text fields after clicking
     private void populateForm() {
     	Product selected = table.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -120,6 +150,7 @@ public class ProductPanel extends BorderPane {
         }
 	}
 
+    // returns true if any of the fields is empty, 
 	private boolean fieldIsEmpty() {
     	if(!modelField.getText().isEmpty() &&!merkField.getText().isEmpty()&&!warnaField.getText().isEmpty()&&!hargaField.getText().isEmpty()) {
     		return false;
@@ -128,6 +159,7 @@ public class ProductPanel extends BorderPane {
     	}
     }
     
+	// clears all text fields
     private void clearFields() {
         modelField.clear();
         merkField.clear();
