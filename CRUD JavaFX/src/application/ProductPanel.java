@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
 
 
 public class ProductPanel extends BorderPane {
-    private TableView<Product> table;
+    private TableView<Product> productTable;
     private TextField modelField;
     private TextField merkField;
     private TextField warnaField;
@@ -66,7 +66,7 @@ public class ProductPanel extends BorderPane {
         formPane.add(buttonBox, 1, 4);
 
         // Table
-        table = new TableView<Product>();
+        productTable = new TableView<Product>();
         
         // Table columns
         TableColumn<Product, String> kodeCol = new TableColumn<>("Kode");
@@ -84,22 +84,22 @@ public class ProductPanel extends BorderPane {
         TableColumn<Product, String> hargaCol = new TableColumn<>("Harga");
         hargaCol.setCellValueFactory(new PropertyValueFactory<>("harga"));
 
-        table.getColumns().addAll(kodeCol, modelCol, merkCol, warnaCol, hargaCol);
+        productTable.getColumns().addAll(kodeCol, modelCol, merkCol, warnaCol, hargaCol);
 
         
         loadTable(); // load tables with products
         addButton.setOnAction(e -> addProduct());
         delButton.setOnAction(e -> deleteProduct());
         updButton.setOnAction(e -> updateProduct());
-        table.setOnMouseClicked(e -> populateForm());
+        productTable.setOnMouseClicked(e -> populateForm());
         
         
         this.setLeft(formPane);
-        this.setRight(table);
+        this.setRight(productTable);
     }
     
     private void updateProduct() {
-    	Product selected = table.getSelectionModel().getSelectedItem();
+    	Product selected = productTable.getSelectionModel().getSelectedItem();
     	if (selected != null) {
 	    	String tempModel = modelField.getText();
 	    	String tempMerek = merkField.getText();
@@ -135,13 +135,13 @@ public class ProductPanel extends BorderPane {
     // Make list, connect to DB, fills the list with data, insert list to table 
     private void loadTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
-    	table.setItems(productList);
+    	productTable.setItems(productList);
     	System.out.println("[+] Table data refreshed");
     }
     
     // auto fill text fields after clicking
     private void populateForm() {
-    	Product selected = table.getSelectionModel().getSelectedItem();
+    	Product selected = productTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             modelField.setText(selected.getModel());
             merkField.setText(selected.getMerk());
@@ -193,7 +193,7 @@ public class ProductPanel extends BorderPane {
         clearFields();
     }
     private void deleteProduct() {
-    	Product selected = table.getSelectionModel().getSelectedItem();
+    	Product selected = productTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
         	if(ProductHandler.deleteProduct(selected.getKode())) {
     			loadTable();

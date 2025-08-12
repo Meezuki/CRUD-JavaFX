@@ -1,0 +1,22 @@
+CREATE DATABASE shoestore;
+USE shoestore;
+
+CREATE TABLE sepatu (
+    kode_sepatu VARCHAR(10) PRIMARY KEY,
+    model_sepatu VARCHAR(100) NOT NULL,
+    merk_sepatu VARCHAR(100) NOT NULL,
+    warna_sepatu VARCHAR(100) NOT NULL,
+    harga_sepatu VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE struk (
+    struk_id INT PRIMARY KEY AUTO_INCREMENT,
+    kode_sepatu VARCHAR(10) NOT NULL,
+    model_sepatu VARCHAR(100) NOT NULL,
+    merk_sepatu VARCHAR(100) NOT NULL,
+    warna_sepatu VARCHAR(100) NOT NULL,
+    harga_sepatu INT NOT NULL,
+    kuantitas_sepatu INT NOT NULL,
+    uang_pembayaran INT NOT NULL,
+    FOREIGN KEY (kode_sepatu) REFERENCES sepatu(kode_sepatu)
+);
