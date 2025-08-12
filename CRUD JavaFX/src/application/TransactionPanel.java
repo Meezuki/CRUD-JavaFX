@@ -19,13 +19,16 @@ public class TransactionPanel extends BorderPane {
 
     private TextField kodeField, modelField, merkField, warnaField, hargaField;
     private TextField kuantitasField, uangPembayaranField;
-    private Label totalLabel, changeLabel;
-
+    private Label totalValueLabel, changeValueLabel;
+    
     private ObservableList<TransactionItem> transactionList;
-
+    private ObservableList<Product> productList;
+    
+    
+    
     public TransactionPanel() {
         transactionList = FXCollections.observableArrayList();
-
+        
         // LEFT FORM
         GridPane formPane = new GridPane();
         formPane.setPadding(new Insets(30));
@@ -46,25 +49,35 @@ public class TransactionPanel extends BorderPane {
         formPane.add(new Label("Merk:"), 0, 2); formPane.add(merkField, 1, 2);
         formPane.add(new Label("Warna:"), 0, 3); formPane.add(warnaField, 1, 3);
         formPane.add(new Label("Harga:"), 0, 4); formPane.add(hargaField, 1, 4);
-        formPane.add(new Label("Qty:"), 0, 5); formPane.add(kuantitasField, 1, 5);
-        formPane.add(new Label("Payment:"), 0, 6); formPane.add(uangPembayaranField, 1, 6);
+        formPane.add(new Label("Kuantitas:"), 0, 5); formPane.add(kuantitasField, 1, 5);
+        formPane.add(new Label("Pembayaran:"), 0, 6); formPane.add(uangPembayaranField, 1, 6);
+        
+        
+ 
+        Label totalTextLabel = new Label("Total:");
+        Label changeTextLabel = new Label("Change:");
+        
+        totalValueLabel = new Label("0");
+        changeValueLabel = new Label("0");
+        
+        formPane.add(totalTextLabel, 0, 7);
+        formPane.add(totalValueLabel, 1, 7);
+        
+        formPane.add(changeTextLabel, 0, 8);
+        formPane.add(changeValueLabel, 1, 8);
 
-        totalLabel = new Label("Total: 0");
-        changeLabel = new Label("Change: 0");
-        formPane.add(totalLabel, 1, 7);
-        formPane.add(changeLabel, 1, 8);
-
-        Button addToCartBtn = new Button("Add to Cart");
+        
         Button completeBtn = new Button("Complete Transaction");
         Button printBtn = new Button("Print Receipt");
 
-        VBox buttonBox = new VBox(10, addToCartBtn, completeBtn, printBtn);
+        VBox buttonBox = new VBox(10,  completeBtn, printBtn);
         formPane.add(buttonBox, 1, 9);
 
+        
+        
+        
         // Product Table and Transactions table
-        
-        
-        
+
         //---------------------------------------- PRODUCT Table----------------------------------------------------
         productTable = new TableView<Product>();
         
@@ -86,9 +99,11 @@ public class TransactionPanel extends BorderPane {
 
         productTable.getColumns().addAll(kodeCol, modelCol, merkCol, warnaCol, hargaCol);
         
+        // loads product table
+        loadProductTable();
     
-        
-        
+        // on mouse click event
+        productTable.setOnMouseClicked(e -> populateForm());
         
         
       //---------------------------------------- Transaction Table----------------------------------------------------
@@ -120,10 +135,12 @@ public class TransactionPanel extends BorderPane {
         transactionTable.setItems(transactionList);
 
         // Event Handlers
-        addToCartBtn.setOnAction(e -> addToCart());
+        
         completeBtn.setOnAction(e -> completeTransaction());
         printBtn.setOnAction(e -> printReceipt());
         
+        kuantitasField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalAndChange());
+        uangPembayaranField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalAndChange());
         
         // group the tables together
         VBox tableBox = new VBox(10,productTable, transactionTable);
@@ -132,6 +149,46 @@ public class TransactionPanel extends BorderPane {
         this.setCenter(tableBox);
     }
 
+    
+    private void updateTotalAndChange() {
+		try {
+			Integer quantity = Integer.parseInt(kuantitasField.getText());
+			Integer price = Integer.parseInt(hargaField.getText());
+			Integer totalPaid = Integer.parseInt(uangPembayaranField.getText());
+			
+			
+			int total = quantity*price;
+			int change = totalPaid - total;
+			
+			totalValueLabel.setText((String.valueOf(total)));
+			changeValueLabel.setText((String.valueOf(change)));
+		} catch (Exception e) {
+			totalValueLabel.setText("0");
+			changeValueLabel.setText("0");
+		}
+    	
+		return;
+	}
+
+
+	private void loadProductTable() {
+    	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
+    	productTable.setItems(productList);
+    	System.out.println("[+] Table data refreshed");
+    }
+
+	
+	private void populateForm() {
+    	Product selected = productTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+        	kodeField.setText(selected.getKode());
+            modelField.setText(selected.getModel());
+            merkField.setText(selected.getMerk());
+            warnaField.setText(selected.getWarna());
+            hargaField.setText(selected.getHarga());
+        }
+	}
+    
 	private Object printReceipt() {
 		// TODO Auto-generated method stub
 		return null;
@@ -142,8 +199,5 @@ public class TransactionPanel extends BorderPane {
 		return null;
 	}
 
-	private Object addToCart() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }

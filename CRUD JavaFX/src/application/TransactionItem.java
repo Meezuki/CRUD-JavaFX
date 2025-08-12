@@ -9,14 +9,14 @@ public class TransactionItem {
     private Integer kuantitas;
     private Integer uang_pembayaran;
     
-    public TransactionItem(String kode, String model, String merk, String warna, Integer harga, Integer kuantitas, Integer uang_pembayaran) {
-    	this.setKode(kode);
-    	this.setModel(model);
-    	this.setMerk(merk);
-    	this.setWarna(warna);
-    	this.setHarga(harga);
-    	this.setKuantitas(kuantitas);
-    	this.setUang_pembayaran(uang_pembayaran);
+    public TransactionItem(String kode, String model, String merk, String warna, int harga, int kuantitas, int uang_pembayaran) {
+    	this.kode = kode;
+    	this.model = model;
+    	this.merk = merk;
+    	this.warna = warna;
+    	this.harga = harga;
+    	this.kuantitas = kuantitas;
+    	this.uang_pembayaran = uang_pembayaran;
     }
 
 	public String getKode() {

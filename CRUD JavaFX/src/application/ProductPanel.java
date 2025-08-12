@@ -28,12 +28,12 @@ public class ProductPanel extends BorderPane {
 
     public ProductPanel() {
     	
-    	
-    	
+    	// LEFT FORM
         GridPane formPane = new GridPane();
         formPane.setPadding(new Insets(30));
         formPane.setHgap(20);
         formPane.setVgap(20);
+        
 
         // Labels and Text Fields
         Label modelLabel = new Label("Model:");
@@ -87,7 +87,7 @@ public class ProductPanel extends BorderPane {
         productTable.getColumns().addAll(kodeCol, modelCol, merkCol, warnaCol, hargaCol);
 
         
-        loadTable(); // load tables with products
+        loadProductTable(); // load tables with products
         addButton.setOnAction(e -> addProduct());
         delButton.setOnAction(e -> deleteProduct());
         updButton.setOnAction(e -> updateProduct());
@@ -110,7 +110,7 @@ public class ProductPanel extends BorderPane {
 	    		Product product = new Product(selected.getKode(),tempModel, tempMerek, tempWarna, tempHarga);
 	    		//modifies the column in and load table
 	    		if(ProductHandler.updateProduct(product)) {
-	    			loadTable();
+	    			loadProductTable();
 	    		} else {
 	    			showError("Operation Failed. Something broke");
 	    		}
@@ -133,7 +133,7 @@ public class ProductPanel extends BorderPane {
     }
     
     // Make list, connect to DB, fills the list with data, insert list to table 
-    private void loadTable() {
+    private void loadProductTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
     	productTable.setItems(productList);
     	System.out.println("[+] Table data refreshed");
@@ -181,7 +181,7 @@ public class ProductPanel extends BorderPane {
     		
     		//add to the database and refresh table
     		if(ProductHandler.insertProduct(product)) {
-    			loadTable();
+    			loadProductTable();
     		} else {
     			showError("Operation Failed. Something broke");
     		}
@@ -196,7 +196,7 @@ public class ProductPanel extends BorderPane {
     	Product selected = productTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
         	if(ProductHandler.deleteProduct(selected.getKode())) {
-    			loadTable();
+    			loadProductTable();
     		} else {
     			showError("Operation Failed. Something broke");
     		}
@@ -205,7 +205,7 @@ public class ProductPanel extends BorderPane {
         	showError("No product is currently selected!");
         	return;
         }
-        loadTable();
+        loadProductTable();
     }
     
     
