@@ -3,6 +3,7 @@ package application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -11,9 +12,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 
 public class ProductPanel extends BorderPane {
@@ -29,6 +33,23 @@ public class ProductPanel extends BorderPane {
     public ProductPanel() {
     	
     	// LEFT FORM
+    	// Load shoe icon
+    	Image shoeIcon = new Image(getClass().getResourceAsStream("/images/shoeicon.png")); 
+    	ImageView shoeIconView = new ImageView(shoeIcon);
+    	shoeIconView.setFitHeight(32); 
+    	shoeIconView.setPreserveRatio(true);
+
+    	// Title Label
+    	Label productPanelTitle = new Label("Add / Edit Products");
+    	productPanelTitle.getStyleClass().add("product-panel-title");
+
+    	// Put icon and label inside HBox
+    	HBox titleBox = new HBox(10, shoeIconView, productPanelTitle);
+    	titleBox.setAlignment(Pos.CENTER_LEFT);
+    	titleBox.setPadding(new Insets(10));
+    	titleBox.setStyle("-fx-background-color: #2c3e50;");
+
+    	// make the form pane
         GridPane formPane = new GridPane();
         formPane.setPadding(new Insets(30));
         formPane.setHgap(20);
@@ -70,10 +91,10 @@ public class ProductPanel extends BorderPane {
         
         // Table columns
         TableColumn<Product, String> kodeCol = new TableColumn<>("Kode");
-        kodeCol.setCellValueFactory(new PropertyValueFactory<>("kode"));
+        kodeCol.setCellValueFactory(new PropertyValueFactory<>("kode")); // calls getKode()
 
         TableColumn<Product, String> modelCol = new TableColumn<>("Model"); 
-        modelCol.setCellValueFactory(new PropertyValueFactory<>("model")); // bound to Product.getModel()
+        modelCol.setCellValueFactory(new PropertyValueFactory<>("model")); 
 
         TableColumn<Product, String> merkCol = new TableColumn<>("Merk");
         merkCol.setCellValueFactory(new PropertyValueFactory<>("merk"));
@@ -94,8 +115,10 @@ public class ProductPanel extends BorderPane {
         productTable.setOnMouseClicked(e -> populateForm());
         
         
-        this.setLeft(formPane);
-        this.setRight(productTable);
+        VBox leftPanel = new VBox(10, titleBox, formPane);
+        
+        this.setLeft(leftPanel);
+        this.setCenter(productTable);
     }
     
     private void updateProduct() {
@@ -183,7 +206,7 @@ public class ProductPanel extends BorderPane {
     		if(ProductHandler.insertProduct(product)) {
     			loadProductTable();
     		} else {
-    			showError("Operation Failed. Something broke");
+    			showError("Operation Failed.");
     		}
     		
     	} else {
@@ -198,7 +221,7 @@ public class ProductPanel extends BorderPane {
         	if(ProductHandler.deleteProduct(selected.getKode())) {
     			loadProductTable();
     		} else {
-    			showError("Operation Failed. Something broke");
+    			showError("Operation Failed.");
     		}
         	
         } else {

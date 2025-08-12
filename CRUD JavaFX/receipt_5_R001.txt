@@ -1,0 +1,12 @@
+===== SHOE STORE RECEIPT =====
+Kode Sepatu    : R001
+Model          : Classic Leather
+Merk           : Reebok
+Warna          : Putih
+Qty            : 2
+Harga Satuan   : 1300000
+Total          : 2600000
+Pembayaran     : 2600000
+Kembalian      : 0
+=============================
+Thank you for your purchase!

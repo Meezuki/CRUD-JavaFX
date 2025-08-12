@@ -1,6 +1,7 @@
 package application;
 
 public class TransactionItem {
+	private int struk_id;
 	private String kode;
     private String model;
     private String merk;
@@ -9,7 +10,8 @@ public class TransactionItem {
     private Integer kuantitas;
     private Integer uang_pembayaran;
     
-    public TransactionItem(String kode, String model, String merk, String warna, int harga, int kuantitas, int uang_pembayaran) {
+    public TransactionItem(int struk_id, String kode, String model, String merk, String warna, int harga, int kuantitas, int uang_pembayaran) {
+    	this.setStruk_id(struk_id);
     	this.kode = kode;
     	this.model = model;
     	this.merk = merk;
@@ -73,6 +75,14 @@ public class TransactionItem {
 
 	public void setUang_pembayaran(Integer uang_pembayaran) {
 		this.uang_pembayaran = uang_pembayaran;
+	}
+
+	public int getStruk_id() {
+		return struk_id;
+	}
+
+	public void setStruk_id(int struk_id) {
+		this.struk_id = struk_id;
 	}
     
 }

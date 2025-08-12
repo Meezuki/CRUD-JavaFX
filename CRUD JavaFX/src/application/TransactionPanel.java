@@ -1,13 +1,18 @@
 package application;
 
+import java.io.IOException;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -23,6 +28,8 @@ public class TransactionPanel extends BorderPane {
     
     private ObservableList<TransactionItem> transactionList;
     private ObservableList<Product> productList;
+    
+    private Alert a;
     
     
     
@@ -86,7 +93,7 @@ public class TransactionPanel extends BorderPane {
         kodeCol.setCellValueFactory(new PropertyValueFactory<>("kode"));
 
         TableColumn<Product, String> modelCol = new TableColumn<>("Model"); 
-        modelCol.setCellValueFactory(new PropertyValueFactory<>("model")); // bound to Product.getModel()
+        modelCol.setCellValueFactory(new PropertyValueFactory<>("model")); 
 
         TableColumn<Product, String> merkCol = new TableColumn<>("Merk");
         merkCol.setCellValueFactory(new PropertyValueFactory<>("merk"));
@@ -109,10 +116,13 @@ public class TransactionPanel extends BorderPane {
       //---------------------------------------- Transaction Table----------------------------------------------------
         transactionTable = new TableView<>();
         
+        TableColumn<TransactionItem, String> strukCol2 = new TableColumn<>("Id Struk");
+        strukCol2.setCellValueFactory(new PropertyValueFactory<>("struk_id"));
+        
+        // genius variable naming
         TableColumn<TransactionItem, String> kodeCol2 = new TableColumn<>("Kode");
         kodeCol2.setCellValueFactory(new PropertyValueFactory<>("kode"));
 
-        
         TableColumn<TransactionItem, String> modelCol2 = new TableColumn<>("Model");
         modelCol2.setCellValueFactory(new PropertyValueFactory<>("model"));
 
@@ -131,16 +141,20 @@ public class TransactionPanel extends BorderPane {
         TableColumn<TransactionItem, Integer> uangPembayaranCol2 = new TableColumn<>("Uang Pembayaran");
         uangPembayaranCol2.setCellValueFactory(new PropertyValueFactory<>("uang_pembayaran"));
 
-        transactionTable.getColumns().addAll(kodeCol2, modelCol2, merkCol2, warnaCol2, kuantitasCol2, hargaCol2, uangPembayaranCol2);
-        transactionTable.setItems(transactionList);
+        transactionTable.getColumns().addAll(strukCol2,kodeCol2, modelCol2, merkCol2, warnaCol2, kuantitasCol2, hargaCol2, uangPembayaranCol2);
+        
 
+        //load transaction table
+        loadTransactionTable();
+        
+        
         // Event Handlers
         
         completeBtn.setOnAction(e -> completeTransaction());
         printBtn.setOnAction(e -> printReceipt());
         
-        kuantitasField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalAndChange());
-        uangPembayaranField.textProperty().addListener((observable, oldValue, newValue) -> updateTotalAndChange());
+        kuantitasField.textProperty().addListener((observable, oldValue, newValue) -> updateTotal());
+        uangPembayaranField.textProperty().addListener((observable, oldValue, newValue) -> updateChange());
         
         // group the tables together
         VBox tableBox = new VBox(10,productTable, transactionTable);
@@ -150,20 +164,31 @@ public class TransactionPanel extends BorderPane {
     }
 
     
-    private void updateTotalAndChange() {
+    private void updateTotal() {
+    	try {
+			Integer quantity = Integer.parseInt(kuantitasField.getText());
+			Integer price = Integer.parseInt(hargaField.getText());
+			int total = quantity*price;
+			totalValueLabel.setText((String.valueOf(total)));
+		} catch (Exception e) {
+			totalValueLabel.setText("0");
+			
+		}
+    	
+		return;
+	}
+
+
+	private void updateChange() {
 		try {
 			Integer quantity = Integer.parseInt(kuantitasField.getText());
 			Integer price = Integer.parseInt(hargaField.getText());
 			Integer totalPaid = Integer.parseInt(uangPembayaranField.getText());
-			
-			
+
 			int total = quantity*price;
 			int change = totalPaid - total;
-			
-			totalValueLabel.setText((String.valueOf(total)));
 			changeValueLabel.setText((String.valueOf(change)));
 		} catch (Exception e) {
-			totalValueLabel.setText("0");
 			changeValueLabel.setText("0");
 		}
     	
@@ -174,7 +199,14 @@ public class TransactionPanel extends BorderPane {
 	private void loadProductTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
     	productTable.setItems(productList);
-    	System.out.println("[+] Table data refreshed");
+    	System.out.println("[+] Product table data refreshed");
+    }
+	
+	
+    private void loadTransactionTable() {
+    	transactionList = FXCollections.observableArrayList(TransactionHandler.getAllProducts());
+    	transactionTable.setItems(transactionList);
+    	System.out.println("[+] Transaction table data refreshed");
     }
 
 	
@@ -188,16 +220,110 @@ public class TransactionPanel extends BorderPane {
             hargaField.setText(selected.getHarga());
         }
 	}
-    
-	private Object printReceipt() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	// check also kuantitas and uang pembayaran text fields
+	private boolean fieldIsEmpty() {
+    	if(!kodeField.getText().isEmpty()&&!modelField.getText().isEmpty() &&!merkField.getText().isEmpty()&&!warnaField.getText().isEmpty()&&!hargaField.getText().isEmpty()
+    			&& kuantitasField.getText().isEmpty()&& uangPembayaranField.getText().isEmpty()) {
+    		return false;
+    	} else {
+    		return true;
+    	}
+    }
+	
+	// make a transaction
+	private void completeTransaction() {
+		Product selected = productTable.getSelectionModel().getSelectedItem();
+		if(selected!= null) {
+			
+			// check if valid
+			try {
+				Integer quantity = Integer.parseInt(kuantitasField.getText());
+				Integer price = Integer.parseInt(hargaField.getText());
+				Integer totalPaid = Integer.parseInt(uangPembayaranField.getText());
+				
+				int total = quantity*price;
+				
+				if(totalPaid < total) {
+					showError("Payment is lower than total!"); //stop here
+					return;
+				} else if(quantity<=0 ) {
+					showError("Quantity must be at least 1");
+					return;
+				}
+				
+				
+				if(TransactionHandler.insertTransaction(selected, quantity, totalPaid)) {
+					loadTransactionTable();
+				}
+				
+			} catch (Exception e) {
+				showError("Invalid input! (Must be a valid Integer)");
+				// TODO: handle exception
+			}
+			
+			
+		} else {
+			showError("No product currently selected!");
+			
+		} 
+		return;
+	}
+	
+	
+	private void printReceipt() {
+		TransactionItem selected = transactionTable.getSelectionModel().getSelectedItem();
+		if(selected!=null) {
+			 StringBuilder receipt = new StringBuilder();
+			    receipt.append("===== SHOE STORE RECEIPT =====\n");
+			    receipt.append("Kode Sepatu    : ").append(selected.getKode()).append("\n");
+			    receipt.append("Model          : ").append(selected.getModel()).append("\n");
+			    receipt.append("Merk           : ").append(selected.getMerk()).append("\n");
+			    receipt.append("Warna          : ").append(selected.getWarna()).append("\n");
+			    receipt.append("Qty            : ").append(selected.getKuantitas()).append("\n");
+			    receipt.append("Harga Satuan   : ").append(selected.getHarga()).append("\n");
+			    receipt.append("Total          : ").append(selected.getKuantitas() * selected.getHarga()).append("\n");
+			    receipt.append("Pembayaran     : ").append(selected.getUang_pembayaran()).append("\n");
+			    receipt.append("Kembalian      : ").append(selected.getUang_pembayaran() - (selected.getKuantitas() * selected.getHarga())).append("\n");
+			    receipt.append("=============================\n");
+			    receipt.append("Thank you for your purchase!\n");
+
+			    
+			    System.out.println(receipt.toString());
+			    try {
+			    	int struk_id = selected.getStruk_id();
+			    	String fileName = "receipt_" + String.valueOf(struk_id) + "_" + selected.getKode();
+					String dest = FileHandling.create_file(fileName);
+					FileHandling.write_file(fileName, receipt.toString());
+					
+					// send feedback
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Receipt");
+					alert.setHeaderText("Transaction Receipt saved\n" + dest);
+					TextArea textArea = new TextArea(receipt.toString());
+					textArea.setEditable(false);
+					alert.getDialogPane().setContent(textArea);
+					alert.showAndWait();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					showError("Failed to create .txt file");
+				}
+			    
+		} else {
+			showError("No transaction currently selected!");
+		}
+		
+		return;
 	}
 
-	private Object completeTransaction() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	//Print error message
+    private void showError(String msg) {
+    	a = new Alert(AlertType.ERROR);
+		a.setContentText(msg);
+		a.show();
+    }
 
 	
 }

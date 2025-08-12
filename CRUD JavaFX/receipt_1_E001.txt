@@ -1,0 +1,12 @@
+===== SHOE STORE RECEIPT =====
+Kode Sepatu    : E001
+Model          : Sandals
+Merk           : Eiger
+Warna          : Abu-abu
+Qty            : 2
+Harga Satuan   : 350000
+Total          : 700000
+Pembayaran     : 1000000
+Kembalian      : 300000
+=============================
+Thank you for your purchase!
