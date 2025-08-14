@@ -28,7 +28,7 @@ public class TransactionHandler {
 						res.getInt("kuantitas_sepatu"),
 						res.getInt("uang_pembayaran")));
 			}
-			System.out.println("[+] Transaction List successfully obtained");
+			//System.out.println("[+] Transaction List successfully obtained");
 			
 			
 		} catch (Exception e) {

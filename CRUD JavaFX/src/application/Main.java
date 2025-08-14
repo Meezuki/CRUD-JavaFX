@@ -34,7 +34,14 @@ public class Main extends Application {
 			productTab.setClosable(false);
 			transactionTab.setClosable(false);
 			
-			Scene scene = new Scene(tabPane,900,500);
+			//refresh product table in transaction panel each time this tab is opened
+			tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+                if (newTab == transactionTab) {
+                    transactionPanel.loadProductTable();
+                }
+            });
+			
+			Scene scene = new Scene(tabPane,900,550);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();

@@ -5,6 +5,7 @@ import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,8 +15,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class TransactionPanel extends BorderPane {
@@ -37,6 +41,29 @@ public class TransactionPanel extends BorderPane {
         transactionList = FXCollections.observableArrayList();
         
         // LEFT FORM
+        
+        // LEFT FORM
+    	// Load shoe icon
+    	Image transactionIcon = new Image(getClass().getResourceAsStream("/images/transactionicon.png")); 
+    	ImageView shoeIconView = new ImageView(transactionIcon);
+    	shoeIconView.setFitHeight(32); 
+    	shoeIconView.setPreserveRatio(true);
+
+    	// Title Label
+    	Label transactionPanelTitle = new Label("Add Transactions");
+    	transactionPanelTitle.getStyleClass().add("product-panel-title");
+
+    	// Put icon and label inside HBox
+    	HBox titleBox = new HBox(10, shoeIconView, transactionPanelTitle);
+    	titleBox.setAlignment(Pos.CENTER_LEFT);
+    	titleBox.setPadding(new Insets(10));
+    	titleBox.setStyle("-fx-background-color: #2c3e50;");
+        
+        
+        
+        
+        
+        
         GridPane formPane = new GridPane();
         formPane.setPadding(new Insets(30));
         formPane.setHgap(10);
@@ -135,7 +162,7 @@ public class TransactionPanel extends BorderPane {
         TableColumn<TransactionItem, Integer> kuantitasCol2 = new TableColumn<>("Kuantitas");
         kuantitasCol2.setCellValueFactory(new PropertyValueFactory<>("kuantitas"));
 
-        TableColumn<TransactionItem, Integer> hargaCol2 = new TableColumn<>("Price");
+        TableColumn<TransactionItem, Integer> hargaCol2 = new TableColumn<>("Harga");
         hargaCol2.setCellValueFactory(new PropertyValueFactory<>("harga"));
 
         TableColumn<TransactionItem, Integer> uangPembayaranCol2 = new TableColumn<>("Uang Pembayaran");
@@ -159,7 +186,10 @@ public class TransactionPanel extends BorderPane {
         // group the tables together
         VBox tableBox = new VBox(10,productTable, transactionTable);
         
-        this.setLeft(formPane);
+        VBox leftPanel = new VBox(10, titleBox, formPane);
+        
+        
+        this.setLeft(leftPanel);
         this.setCenter(tableBox);
     }
 
@@ -196,7 +226,7 @@ public class TransactionPanel extends BorderPane {
 	}
 
 
-	private void loadProductTable() {
+	public void loadProductTable() {
     	productList = FXCollections.observableArrayList(ProductHandler.getAllProducts());
     	productTable.setItems(productList);
     	System.out.println("[+] Product table data refreshed");
@@ -224,7 +254,7 @@ public class TransactionPanel extends BorderPane {
 	// check also kuantitas and uang pembayaran text fields
 	private boolean fieldIsEmpty() {
     	if(!kodeField.getText().isEmpty()&&!modelField.getText().isEmpty() &&!merkField.getText().isEmpty()&&!warnaField.getText().isEmpty()&&!hargaField.getText().isEmpty()
-    			&& kuantitasField.getText().isEmpty()&& uangPembayaranField.getText().isEmpty()) {
+    			&& !kuantitasField.getText().isEmpty()&& !uangPembayaranField.getText().isEmpty()) {
     		return false;
     	} else {
     		return true;
@@ -234,7 +264,7 @@ public class TransactionPanel extends BorderPane {
 	// make a transaction
 	private void completeTransaction() {
 		Product selected = productTable.getSelectionModel().getSelectedItem();
-		if(selected!= null) {
+		if(selected!= null && !fieldIsEmpty()) {
 			
 			// check if valid
 			try {
@@ -276,6 +306,7 @@ public class TransactionPanel extends BorderPane {
 		if(selected!=null) {
 			 StringBuilder receipt = new StringBuilder();
 			    receipt.append("===== SHOE STORE RECEIPT =====\n");
+			    receipt.append("Transaction ID : ").append(selected.getStruk_id()).append("\n");
 			    receipt.append("Kode Sepatu    : ").append(selected.getKode()).append("\n");
 			    receipt.append("Model          : ").append(selected.getModel()).append("\n");
 			    receipt.append("Merk           : ").append(selected.getMerk()).append("\n");
@@ -306,7 +337,6 @@ public class TransactionPanel extends BorderPane {
 					alert.showAndWait();
 					
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					showError("Failed to create .txt file");
 				}

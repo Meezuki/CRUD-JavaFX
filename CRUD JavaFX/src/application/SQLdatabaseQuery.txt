@@ -20,3 +20,29 @@ CREATE TABLE struk (
     uang_pembayaran INT NOT NULL,
     FOREIGN KEY (kode_sepatu) REFERENCES sepatu(kode_sepatu)
 );
+
+
+
+
+
+--------------------------- TEST DATA --------------------------------
+5 Products
+
+
+INSERT INTO sepatu (kode_sepatu, model_sepatu, merk_sepatu, warna_sepatu, harga_sepatu)
+VALUES
+('S001', 'Air Runner', 'Nike', 'Hitam', '850000'),
+('S002', 'Classic Court', 'Adidas', 'Putih', '750000'),
+('S003', 'Street Flex', 'Puma', 'Merah', '650000'),
+('S004', 'Trail Blazer', 'Reebok', 'Biru', '550000'),
+('S005', 'Urban Step', 'Converse', 'Abu-abu', '450000');
+
+5 Transactions
+
+INSERT INTO struk (kode_sepatu, model_sepatu, merk_sepatu, warna_sepatu, harga_sepatu, kuantitas_sepatu, uang_pembayaran)
+VALUES
+('S001', 'Air Runner', 'Nike', 'Hitam', 850000, 2, 2000000),
+('S002', 'Classic Court', 'Adidas', 'Putih', 750000, 1, 800000),
+('S003', 'Street Flex', 'Puma', 'Merah', 650000, 3, 2000000),
+('S004', 'Trail Blazer', 'Reebok', 'Biru', 550000, 2, 1200000),
+('S005', 'Urban Step', 'Converse', 'Abu-abu', 450000, 4, 2000000);

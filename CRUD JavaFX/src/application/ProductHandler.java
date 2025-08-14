@@ -25,7 +25,7 @@ public class ProductHandler {
 						res.getString("warna_sepatu"),
 						res.getString("harga_sepatu")));
 			}
-			System.out.println("[+] Product List successfully obtained");
+			//System.out.println("[+] Product List successfully obtained");
 			
 			
 		} catch (Exception e) {
