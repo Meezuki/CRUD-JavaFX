@@ -16,3 +16,6 @@ Classpath Entries
 - CRUD JavaFX
 - JRE System Library
 - mysql cnnector jar
+
+Video
+https://youtu.be/Z1VGGjWaLtE
